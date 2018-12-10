@@ -156,7 +156,7 @@ def nep2_to_scripthash(nep2, passphrase):
     return "0x{}".format(script_hash[::-1].hex())
 
 
-def main():
+def create_parser():
     parser = argparse.ArgumentParser()
 
     # Show the neo-python version
@@ -205,10 +205,10 @@ def main():
     parser.add_argument("--nep2-to-scripthash", nargs=2, metavar=("NEP2", "passphrase"),
                         help="Get scripthash from a NEP2 key")
 
-    args = parser.parse_args()
-    if len(sys.argv) == 1:
-        parser.print_help(sys.stderr)
-        exit(1)
+    return parser
+
+
+def cli_functions(args):
 
     # print(args)
     if args.address_to_scripthash:
@@ -321,6 +321,19 @@ def main():
         except Exception as e:
             print(e)
             exit(1)
+
+
+def main():
+    parser = create_parser()
+
+    args = parser.parse_args()
+
+    # if there is no input, show help
+    if len(sys.argv) == 1:
+        parser.print_help(sys.stderr)
+        exit(1)
+
+    cli_functions(args)
 
 
 if __name__ == "__main__":

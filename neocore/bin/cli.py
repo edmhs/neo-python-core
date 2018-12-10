@@ -82,9 +82,7 @@ def wif_to_wallet(WIF):
 
 def wif_to_private_key(WIF):
 
-    return {
-        "private_key" : KeyPair.PrivateKeyFromWIF(WIF)
-    }
+    return KeyPair.PrivateKeyFromWIF(WIF)
 
 
 def wif_to_nep2(WIF, passphrase):
@@ -94,7 +92,35 @@ def wif_to_nep2(WIF, passphrase):
     return keypair.ExportNEP2(passphrase)
 
 
+def wif_to_address(wif):
+    private_key = KeyPair.PrivateKeyFromWIF(wif)
+    keypair = KeyPair(priv_key=private_key)
+    address = keypair.GetAddress()
+    return address
+
+
+def wif_to_public_key(wif):
+    private_key = KeyPair.PrivateKeyFromWIF(wif)
+    keypair = KeyPair(priv_key=private_key)
+    public_key = keypair.PublicKey.encode_point(True)
+    return public_key.decode("utf-8")
+
+
+def wif_to_scripthash(wif):
+    private_key = KeyPair.PrivateKeyFromWIF(wif)
+    keypair = KeyPair(priv_key=private_key)
+    address = keypair.GetAddress()
+    script_hash = address_to_scripthash(address)
+    return "0x{}".format(script_hash[::-1].hex())
+
+
 def nep2_to_wif(NEP2, passphrase):
+    private_key = KeyPair.PrivateKeyFromNEP2(NEP2, passphrase)
+    keypair = KeyPair(priv_key=private_key)
+    return keypair.Export()
+
+
+def nep2_to_wallet(NEP2, passphrase):
     private_key = KeyPair.PrivateKeyFromNEP2(NEP2, passphrase)
     keypair = KeyPair(priv_key=private_key)
     public_key = keypair.PublicKey.encode_point(True)
@@ -106,6 +132,28 @@ def nep2_to_wif(NEP2, passphrase):
         "script_hash": "0x{}".format(script_hash[::-1].hex()),
         "public_key": public_key.decode("utf-8")
     }
+
+
+def nep2_to_address(nep2, passphrase):
+    private_key = KeyPair.PrivateKeyFromNEP2(nep2, passphrase)
+    keypair = KeyPair(priv_key=private_key)
+    address = keypair.GetAddress()
+    return address
+
+
+def nep2_to_public_key(nep2, passphrase):
+    private_key = KeyPair.PrivateKeyFromNEP2(nep2, passphrase)
+    keypair = KeyPair(priv_key=private_key)
+    public_key = keypair.PublicKey.encode_point(True)
+    return public_key.decode("utf-8")
+
+
+def nep2_to_scripthash(nep2, passphrase):
+    private_key = KeyPair.PrivateKeyFromNEP2(nep2, passphrase)
+    keypair = KeyPair(priv_key=private_key)
+    address = keypair.GetAddress()
+    script_hash = address_to_scripthash(address)
+    return "0x{}".format(script_hash[::-1].hex())
 
 
 def main():
@@ -121,15 +169,42 @@ def main():
     parser.add_argument("--scripthash-to-address", nargs=1, metavar="scripthash",
                         help="Convert scripthash to address")
 
-    parser.add_argument("--create-wallet", action="store_true", help="Create a wallet")
+    parser.add_argument("--create-wallet", action="store_true",
+                        help="Create a wallet")
 
-    parser.add_argument("--wif-to-private-key", nargs=1, metavar="WIF", help="Get the private key from a WIF key")
+    parser.add_argument("--wif-to-private-key", nargs=1, metavar="WIF",
+                        help="Get the private key from a WIF key")
 
-    parser.add_argument("--wif-to-wallet", nargs=1, metavar="WIF", help="Get the wallet info from a WIF key")
+    parser.add_argument("--wif-to-wallet", nargs=1, metavar="WIF",
+                        help="Get the wallet info from a WIF key")
 
-    parser.add_argument("--wif-to-nep2", nargs=2, metavar=("WIF","passphrase"), help="Get the NEP2 encrypted key from a WIF key")
+    parser.add_argument("--wif-to-nep2", nargs=2, metavar=("WIF","passphrase"),
+                        help="Get the NEP2 encrypted key from a WIF key")
 
-    parser.add_argument("--nep2-to-wif", nargs=2, metavar=("NEP2","passphrase"), help="Get the WIF key and wallet info from encrypted NEP2 key")
+    parser.add_argument("--wif-to-address", nargs=1, metavar="WIF",
+                        help="Get public address from a WIF key")
+
+    parser.add_argument("--wif-to-public-key", nargs=1, metavar="WIF",
+                        help="Get public key from a WIF key")
+
+    parser.add_argument("--wif-to-scripthash", nargs=1, metavar="WIF",
+                        help="Get scripthash from a WIF key")
+
+    parser.add_argument("--nep2-to-wif", nargs=2, metavar=("NEP2", "passphrase"),
+                        help="Get the WIF key from encrypted NEP2 key")
+
+    parser.add_argument("--nep2-to-wallet", nargs=2, metavar=("NEP2","passphrase"),
+                        help="Get the wallet info from encrypted NEP2 key")
+
+    parser.add_argument("--nep2-to-address", nargs=2, metavar=("NEP2", "passphrase"),
+                        help="Get public address from a NEP2 key")
+
+    parser.add_argument("--nep2-to-public-key", nargs=2, metavar=("NEP2", "passphrase"),
+                        help="Get public key from a NEP2 key")
+
+    parser.add_argument("--nep2-to-scripthash", nargs=2, metavar=("NEP2", "passphrase"),
+                        help="Get scripthash from a NEP2 key")
+
 
 
     args = parser.parse_args()
@@ -185,10 +260,66 @@ def main():
             print(e)
             exit(1)
 
+    if args.wif_to_address:
+        try:
+            w = wif_to_address(args.wif_to_address[0])
+            print(w)
+        except Exception as e:
+            print(e)
+            exit(1)
+
+    if args.wif_to_public_key:
+        try:
+            w = wif_to_public_key(args.wif_to_public_key[0])
+            print(w)
+        except Exception as e:
+            print(e)
+            exit(1)
+
+    if args.wif_to_scripthash:
+        try:
+            w = wif_to_scripthash(args.wif_to_scripthash[0])
+            print(w)
+        except Exception as e:
+            print(e)
+            exit(1)
+
     if args.nep2_to_wif:
         try:
             w = nep2_to_wif(args.nep2_to_wif[0], args.nep2_to_wif[1])
+            print(w)
+        except Exception as e:
+            print(e)
+            exit(1)
+
+    if args.nep2_to_wallet:
+        try:
+            w = nep2_to_wallet(args.nep2_to_wallet[0], args.nep2_to_wallet[1])
             print(json.dumps(w, indent=2))
+        except Exception as e:
+            print(e)
+            exit(1)
+
+    if args.nep2_to_address:
+        try:
+            w = nep2_to_address(args.nep2_to_address[0], args.nep2_to_address[1])
+            print(w)
+        except Exception as e:
+            print(e)
+            exit(1)
+
+    if args.nep2_to_public_key:
+        try:
+            w = nep2_to_public_key(args.nep2_to_public_key[0], args.nep2_to_public_key[1])
+            print(w)
+        except Exception as e:
+            print(e)
+            exit(1)
+
+    if args.nep2_to_scripthash:
+        try:
+            w = nep2_to_scripthash(args.nep2_to_scripthash[0], args.nep2_to_scripthash[1])
+            print(w)
         except Exception as e:
             print(e)
             exit(1)

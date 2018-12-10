@@ -235,6 +235,10 @@ class TestCrypto(TestCase):
         verification_result = Crypto.VerifySignature(b'aabb', keypair_signature, keypair.PublicKey)
         self.assertFalse(verification_result)
 
+        # this should fail because the signature will not match the input data, test if input is string
+        verification_result = Crypto.VerifySignature(str('aabbc'), keypair_signature, keypair.PublicKey, unhex=False)
+        self.assertFalse(verification_result)
+
     def test_script_hash(self):
         # Expected output taken from running: getHash(Buffer.from('abc', 'utf8')).toString('hex')
         # using https://github.com/CityOfZion/neon-wallet-react-native/blob/master/app/api/crypto/index.js

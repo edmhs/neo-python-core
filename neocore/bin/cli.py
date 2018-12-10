@@ -178,7 +178,7 @@ def main():
     parser.add_argument("--wif-to-wallet", nargs=1, metavar="WIF",
                         help="Get the wallet info from a WIF key")
 
-    parser.add_argument("--wif-to-nep2", nargs=2, metavar=("WIF","passphrase"),
+    parser.add_argument("--wif-to-nep2", nargs=2, metavar=("WIF", "passphrase"),
                         help="Get the NEP2 encrypted key from a WIF key")
 
     parser.add_argument("--wif-to-address", nargs=1, metavar="WIF",
@@ -193,7 +193,7 @@ def main():
     parser.add_argument("--nep2-to-wif", nargs=2, metavar=("NEP2", "passphrase"),
                         help="Get the WIF key from encrypted NEP2 key")
 
-    parser.add_argument("--nep2-to-wallet", nargs=2, metavar=("NEP2","passphrase"),
+    parser.add_argument("--nep2-to-wallet", nargs=2, metavar=("NEP2", "passphrase"),
                         help="Get the wallet info from encrypted NEP2 key")
 
     parser.add_argument("--nep2-to-address", nargs=2, metavar=("NEP2", "passphrase"),
@@ -204,8 +204,6 @@ def main():
 
     parser.add_argument("--nep2-to-scripthash", nargs=2, metavar=("NEP2", "passphrase"),
                         help="Get scripthash from a NEP2 key")
-
-
 
     args = parser.parse_args()
     if len(sys.argv) == 1:
@@ -323,6 +321,7 @@ def main():
         except Exception as e:
             print(e)
             exit(1)
+
 
 if __name__ == "__main__":
     main()
